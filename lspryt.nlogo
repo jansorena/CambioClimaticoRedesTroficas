@@ -3,6 +3,8 @@ extensions [ ls ]
 globals [
   red-trofica ; for referencing the mejor modelo
   climate-change-model       ; for referencing the climate change model
+  CO2Anterior
+  CO2Actual
 ]
 
 to setup
@@ -34,12 +36,19 @@ to setup
   ; now show the climate change model
   ls:show climate-change-model
 
+  set CO2Anterior [ count CO2s ] ls:of climate-change-model
+  set CO2Actual [ count CO2s ] ls:of climate-change-model
+
   reset-ticks
 end
 
 to go
 
   ls:ask ls:models [ go ]
+
+  set CO2Anterior CO2Actual
+  set CO2Actual [ count CO2s ] ls:of climate-change-model
+  if(CO2Actual > CO2Anterior) [ ls:ask red-trofica [ set fish-gain-from-food fish-gain-from-food - 1 ] ]
 
   tick
 end
@@ -89,13 +98,13 @@ NIL
 1
 
 BUTTON
-32
-102
-95
-135
+100
+55
+163
+88
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -104,6 +113,28 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+40
+140
+136
+185
+CO2 Anterior
+CO2Anterior
+17
+1
+11
+
+MONITOR
+41
+239
+124
+284
+CO2 Actual
+CO2Actual
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

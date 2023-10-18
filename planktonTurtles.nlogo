@@ -13,7 +13,6 @@ patches-own [ countdown ]    ; this is for the sheep-wolves-grass model version
 to setup
   clear-all
   ifelse netlogo-web? [ set max-fish 10000 ] [ set max-fish 30000 ]
-
   	ask patches [
     set pcolor scale-color blue pycor -35 40
     set countdown random fitoplancton-regrowth-time
@@ -45,7 +44,7 @@ to setup
 
   create-fitoplanctons initial-number-fitoplanctons ; create the wolves, then initialize their variables
   [
-    set shape "bug"
+    set shape "plant"
     set color green
     set size 1  ; easier to see
     setxy random-xcor random-ycor
@@ -142,7 +141,7 @@ to grow-fitoplancton  ; patch procedure
 
   ifelse countdown <= 0
       [
-        sprout-fitoplanctons 1 [set shape "bug" set color red]
+        sprout-fitoplanctons 1 [set shape "plant" set color green]
         set countdown fitoplancton-regrowth-time ]
   [ set countdown countdown - 1 ]
 
@@ -163,10 +162,10 @@ end
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-355
-10
-1052
-708
+426
+14
+1123
+712
 -1
 -1
 13.51
@@ -190,10 +189,10 @@ ticks
 30.0
 
 SLIDER
-5
-60
-179
-93
+8
+51
+182
+84
 initial-number-fishes
 initial-number-fishes
 0
@@ -205,10 +204,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-196
-179
-229
+14
+253
+188
+286
 fish-gain-from-food
 fish-gain-from-food
 0.0
@@ -220,10 +219,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-231
-179
-264
+14
+288
+188
+321
 fish-reproduce
 fish-reproduce
 1.0
@@ -235,10 +234,10 @@ fish-reproduce
 HORIZONTAL
 
 SLIDER
-185
-60
-350
-93
+8
+90
+173
+123
 initial-number-sharks
 initial-number-sharks
 0
@@ -250,10 +249,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-183
-195
-348
-228
+192
+252
+357
+285
 shark-gain-from-food
 shark-gain-from-food
 0.0
@@ -265,10 +264,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-183
-231
-348
-264
+192
+288
+357
+321
 shark-reproduce
 shark-reproduce
 0.0
@@ -280,10 +279,10 @@ shark-reproduce
 HORIZONTAL
 
 SLIDER
-40
-100
-252
-133
+8
+138
+220
+171
 fitoplancton-regrowth-time
 fitoplancton-regrowth-time
 0
@@ -295,10 +294,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-40
-140
-109
-173
+49
+197
+118
+230
 setup
 setup
 NIL
@@ -312,10 +311,10 @@ NIL
 1
 
 BUTTON
-115
-140
-190
-173
+124
+197
+199
+230
 go
 go
 T
@@ -329,10 +328,10 @@ NIL
 0
 
 PLOT
-10
-360
-350
-530
+19
+417
+359
+587
 populations
 time
 pop.
@@ -349,10 +348,10 @@ PENS
 "fitoplanctons / 4" 1.0 0 -10899396 true "" "plot count fitoplanctons / 4"
 
 MONITOR
-41
-308
-111
-353
+50
+365
+120
+410
 fishes
 count fishes
 3
@@ -360,10 +359,10 @@ count fishes
 11
 
 MONITOR
-115
-308
-185
-353
+124
+365
+194
+410
 sharks
 count sharks
 3
@@ -371,10 +370,10 @@ count sharks
 11
 
 MONITOR
-191
-308
-276
-353
+200
+365
+285
+410
 fitoplanctons
 count fitoplanctons
 0
@@ -382,30 +381,30 @@ count fitoplanctons
 11
 
 TEXTBOX
-20
-178
-160
-196
+29
+235
+169
+253
 Fish settings
 11
 0.0
 0
 
 TEXTBOX
-198
-176
-311
-194
+207
+233
+320
+251
 Shark settings
 11
 0.0
 0
 
 SWITCH
-105
-270
-241
-303
+114
+327
+250
+360
 show-energy?
 show-energy?
 1
@@ -413,10 +412,10 @@ show-energy?
 -1000
 
 SLIDER
-150
-21
-356
-54
+7
+11
+213
+44
 initial-number-fitoplanctons
 initial-number-fitoplanctons
 0
