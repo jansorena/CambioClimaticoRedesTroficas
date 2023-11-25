@@ -1,29 +1,26 @@
-globals [ max-fish ]  ; don't let the sheep population grow too large
-
-; Sheep and wolves are both breeds of turtles
-breed [ fishes fish ]  ; sheep is its own plural, so we use "a-sheep" as the singular
+globals [ max-fish total-energy-fishes total-energy-sharks]
+breed [ fishes fish ]
 breed [ sharks shark ]
-breed [fitoplanctons fitoplancton]
+breed [ fitoplanctons fitoplancton ]
 
-fishes-own [ energy ]       ; both wolves and sheep have energy
-sharks-own [energy]
+fishes-own [ energy ] ; fishes y sharks tienen energia
+sharks-own [ energy ]
 
-patches-own [ countdown pH]    ; this is for the sheep-wolves-grass model version
+patches-own [ countdown pH ]
 
 to setup
   clear-all
   ifelse netlogo-web? [ set max-fish 10000 ] [ set max-fish 30000 ]
-  	ask patches [
+
+  ask patches [
     set pcolor scale-color blue pycor -35 40
     set countdown random fitoplancton-regrowth-time
     set pH ph-Initial
     ;set pcolor one-of [ blue sky ]
-    ;ifelse pcolor = blue
-    ;    [ set countdown fitoplancton-regrowth-time ]
-   ; [ set countdown random fitoplancton-regrowth-time ] ; initialize grass regrowth clocks randomly for brown patches
+    ;ifelse pcolor = blue [ set countdown fitoplancton-regrowth-time ][ set countdown random fitoplancton-regrowth-time ]
   ]
 
-  create-fishes initial-number-fishes  ; create the sheep, then initialize their variables
+  create-fishes initial-number-fishes  ; crear fishes
   [
     set shape "fish"
     set color orange
@@ -33,7 +30,7 @@ to setup
     setxy random-xcor random-ycor
   ]
 
-  create-sharks initial-number-sharks  ; create the wolves, then initialize their variables
+  create-sharks initial-number-sharks  ; crear sharks
   [
     set shape "shark"
     set color 3
@@ -42,46 +39,41 @@ to setup
     setxy random-xcor random-ycor
   ]
 
-  create-fitoplanctons initial-number-fitoplanctons ; create the wolves, then initialize their variables
+  create-fitoplanctons initial-number-fitoplanctons ; crear fitoplancton
   [
     set shape "plant"
     set color green
     set size 1  ; easier to see
     setxy random-xcor random-ycor
   ]
+
   display-labels
   reset-ticks
 end
 
 to go
-  ; stop the model if there are no wolves and no sheep
   if not any? turtles [ stop ]
-  ; stop the model if there are no wolves and the number of sheep gets very large
-  if not any? sharks and count fishes > max-fish [ user-message "The fish have inherited the earth" stop ]
+  if not any? sharks and count fishes > max-fish [ user-message "The fish have inherited the earth" stop ] ; Para el modelo si hay muchos fishes
 
   ask fishes [
     move
-
-    ; in this version, sheep eat grass, grass grows, and it costs sheep energy to move
-	set energy energy - 1  ; deduct energy for sheep only if running sheep-wolves-grass model version
-      eat-fitoplancton  ; sheep eat grass only if running the sheep-wolves-grass model version
-      death ; sheep die from starvation only if running the sheep-wolves-grass model version
-
-    reproduce-fish  ; sheep reproduce at a random rate governed by a slider
+    set energy energy - 1  ; reducir energia
+    eat-fitoplancton  ; comer fitoplancton
+    death ; muerte en caso de quedar sin energia
+    reproduce-fish  ; se reproduce segun slider
   ]
 
   ask sharks [
     move
-    set energy energy - 1  ; wolves lose energy as they move
-    eat-fish ; wolves eat a sheep on their patch
-    death ; wolves die if they run out of energy
-    reproduce-sharks ; wolves reproduce at a random rate governed by a slider
+    set energy energy - 1  ; pierden energia
+    eat-fish ; comer fish
+    death ; muerte en caso de quedar sin energia
+    reproduce-sharks ; se reproducen segun slider
   ]
 
   ask fitoplanctons [
-    move-fitoplancton
+    move-fitoplancton ; movimiento fitoplancton
   ]
-
 
   ask patches [
     grow-fitoplancton
@@ -89,69 +81,65 @@ to go
     if (pH < 4.5)[ set pH 4.5 ]
   ]
 
+  set total-energy-fishes sum [energy] of fishes
+  set total-energy-sharks sum [energy] of sharks
+
   tick
   display-labels
 end
 
-to move-fitoplancton  ; turtle procedure
+to move-fitoplancton
   rt random 50
   lt random 50
   fd 0.1
 end
 
-to move  ; turtle procedure
+to move
   rt random 50
   lt random 50
   fd 1
 end
 
-to eat-fitoplancton  ; sheep procedure
-  let prey one-of fitoplanctons-here                    ; grab a random sheep
-  if prey != nobody  [                          ; did we get one? if so,
-    ask prey [ die ]                            ; kill it, and...
-    set energy energy + fish-gain-from-food     ; get energy from eating
+to eat-fitoplancton
+  let prey one-of fitoplanctons-here            ; seleccionar un fitoplancton aleatorio
+  if prey != nobody  [                          ; si es que se obtuvo uno
+    ask prey [ die ]                            ; muere
+    set energy energy + fish-gain-from-food     ; aumento de la energia
   ]
 end
 
-to reproduce-fish  ; sheep procedure
-  if random-float 100 < fish-reproduce [  ; throw "dice" to see if you will reproduce
-    set energy (energy / 2)                ; divide energy between parent and offspring
+to reproduce-fish
+  if random-float 100 < fish-reproduce [   ; "tirar el dado" para decidir si se reproduce o no
+    set energy (energy / 2)                ; divide la energia
     hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step
   ]
 end
 
-to reproduce-sharks  ; wolf procedure
-  if random-float 100 < shark-reproduce [  ; throw "dice" to see if you will reproduce
-    set energy (energy / 2)               ; divide energy between parent and offspring
-    hatch 1 [ rt random-float 360 fd 1 ]  ; hatch an offspring and move it forward 1 step
+to reproduce-sharks
+  if random-float 100 < shark-reproduce [  ; "tirar el dado" para decidir si se reproduce o no
+    set energy (energy / 2)                ; divide la energia
+    hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step
   ]
 end
 
-to eat-fish  ; wolf procedure
-  let prey one-of fishes-here                    ; grab a random sheep
-  if prey != nobody  [                          ; did we get one? if so,
-    ask prey [ die ]                            ; kill it, and...
-    set energy energy + shark-gain-from-food     ; get energy from eating
+to eat-fish
+  let prey one-of fishes-here                   ; seleccionar un fish aleatorio
+  if prey != nobody  [                          ; si es que se obtuvo uno
+    ask prey [ die ]                            ; muere
+    set energy energy + shark-gain-from-food    ; aumento de la energia
   ]
 end
 
-to death  ; turtle procedure (i.e. both wolf and sheep procedure)
-  ; when energy dips below zero, die
-  if energy < 0 [ die ]
+to death
+  if energy < 0 [ die ]  ; cuando la energia es 0, muere
 end
 
-to grow-fitoplancton  ; patch procedure
-  ; countdown on brown patches: if you reach 0, grow some grass
-
-  ifelse countdown <= 0
-      [
-        sprout-fitoplanctons 1 [set shape "plant" set color green]
+to grow-fitoplancton
+  ifelse countdown <= 0  ; si el countdown llega a 0 crece fitoplancton
+      [ sprout-fitoplanctons 1 [set shape "plant" set color green]
         set countdown fitoplancton-regrowth-time ]
   [ set countdown countdown - 1 ]
-
 end
-
-
 
 to display-labels
   ask turtles [ set label "" ]
@@ -160,19 +148,15 @@ to display-labels
     ask fishes [ set label round energy ]
   ]
 end
-
-
-; Copyright 1997 Uri Wilensky.
-; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-426
-14
-1123
-712
+467
+13
+923
+470
 -1
 -1
-13.51
+8.8
 1
 14
 1
@@ -216,7 +200,7 @@ fish-gain-from-food
 fish-gain-from-food
 0.0
 50.0
-4.0
+3.0
 1.0
 1
 NIL
@@ -334,8 +318,8 @@ NIL
 PLOT
 23
 486
-363
-656
+1381
+622
 populations
 time
 pop.
@@ -439,11 +423,30 @@ pH-Initial
 pH-Initial
 4.5
 8.5
-8.0
+8.5
 0.1
 1
 NIL
 HORIZONTAL
+
+PLOT
+23
+643
+1375
+793
+plot 1
+time
+total-energy
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"energy-fishes" 1.0 0 -612749 true "" "plot total-energy-fishes"
+"energy-sharks" 1.0 0 -16777216 true "" "plot total-energy-sharks"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -886,7 +889,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.3.0
+NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
