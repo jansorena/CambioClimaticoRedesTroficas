@@ -1,4 +1,4 @@
-globals [ max-fish total-energy-fishes total-energy-sharks]
+globals [ max-fish total-energy-fishes total-energy-sharks max-cyanobacterias]
 breed [ fishes fish ]
 breed [ sharks shark ]
 breed [ fitoplanctons fitoplancton ]
@@ -12,7 +12,7 @@ patches-own [ countdown pH temp]
 to setup
   clear-all
   ifelse netlogo-web? [ set max-fish 10000 ] [ set max-fish 30000 ]
-
+  set max-cyanobacterias 2000
   ask patches [
     set pcolor scale-color blue pycor -35 40
     set countdown random fitoplancton-regrowth-time
@@ -58,16 +58,17 @@ to go
 
   ask fishes [
     move
-    set energy energy - (1 * (temp / 17))
+    set energy energy - 1
     ; reducir energia
     eat-fitoplancton  ; comer fitoplancton
     death ; muerte en caso de quedar sin energia
     reproduce-fish  ; se reproduce segun slider
+    ;eat-fish-cianobacterias
   ]
 
   ask sharks [
     move
-    set energy energy - (1 * (temp / 17))
+    set energy energy - 1
     eat-fish ; comer fish
     death ; muerte en caso de quedar sin energia
     reproduce-sharks ; se reproducen segun slider
@@ -75,7 +76,11 @@ to go
 
   ask fitoplanctons [
     move-fitoplancton ; movimiento fitoplancton
-    check-temperature
+    eat-cyanobacterias
+  ]
+
+  ask cyanobacterias[
+    move-fitoplancton
   ]
 
   ask patches [
@@ -87,7 +92,10 @@ to go
   set total-energy-fishes sum [energy] of fishes
   set total-energy-sharks sum [energy] of sharks
 
+  contaminacion-cyanobacterias
+  check-temperature
   tick
+
   display-labels
 end
 
@@ -108,6 +116,14 @@ to eat-fitoplancton
   if prey != nobody and [color] of prey != red [                          ; si es que se obtuvo uno
     ask prey [ die ]                            ; muere
     set energy energy + fish-gain-from-food     ; aumento de la energia
+  ]
+end
+
+to eat-fish-cianobacterias
+  let prey one-of cyanobacterias-here         ; seleccionar un fish aleatorio
+  if prey != nobody[                          ; si es que se obtuvo uno
+    ask prey [ die ]
+    set energy energy - 2
   ]
 end
 
@@ -162,11 +178,43 @@ to display-labels
 end
 
 to check-temperature
-  if temp > 18 and random-float 100 < 5; Ajusta la temperatura crítica según tu modelo
-    [
+  ask one-of patches [
+    sprout-cyanobacterias (temp / 4) [
+      set shape "ant 2"
       set color red
+      setxy random-xcor random-ycor
     ]
+  ]
+end
 
+to contaminacion-cyanobacterias
+  ask patches with [any? cyanobacterias-here] [
+    ; Disminuir la energía en todos los agentes en este parche con cyanobacterias
+    ask sharks-here [
+      set energy energy - 1
+    ]
+    ask fishes-here [
+      set energy energy - 1
+    ]
+    ; Puedes extender esta lógica para otras especies (tiburones, tortugas, etc.) si es necesario
+  ]
+end
+
+to limitar-cyanobacterias
+  ; Limitar el número de cyanobacterias
+  if count cyanobacterias > max-cyanobacterias [
+    let exceso count cyanobacterias - max-cyanobacterias
+    ask n-of exceso cyanobacterias [
+      die
+    ]
+  ]
+end
+
+to eat-cyanobacterias
+  let prey one-of cyanobacterias-here         ; seleccionar un fish aleatorio
+  if prey != nobody[                          ; si es que se obtuvo uno
+    ask prey [ die ]                          ; muere
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -353,8 +401,8 @@ true
 PENS
 "fishes" 1.0 0 -612749 true "" "plot count fishes"
 "sharks" 1.0 0 -16449023 true "" "plot count sharks"
-"fitoplanctons / 4" 1.0 0 -10899396 true "" "plot count fitoplanctons with [color = green] / 4"
-"bacterias" 1.0 0 -2674135 true "" "plot count fitoplanctons with [color = red] / 4"
+"fitoplanctons / 4" 1.0 0 -10899396 true "" "plot count fitoplanctons / 4"
+"bacterias" 1.0 0 -2674135 true "" "plot count cyanobacterias"
 
 MONITOR
 54
@@ -381,10 +429,10 @@ count sharks
 MONITOR
 204
 434
-289
+292
 479
-fito green
-count fitoplanctons with [color = green]
+fitoplancton
+count fitoplanctons
 0
 1
 11
@@ -444,7 +492,7 @@ pH-Initial
 pH-Initial
 4.5
 8.5
-4.9
+5.1
 0.1
 1
 NIL
@@ -466,19 +514,19 @@ true
 true
 "" ""
 PENS
-"energy-fishes" 1.0 0 -612749 true "" "plot total-energy-fishes"
-"energy-sharks" 1.0 0 -16777216 true "" "plot total-energy-sharks"
+"energy-fishes" 1.0 0 -612749 true "" "plot mean [energy] of fishes"
+"energy-sharks" 1.0 0 -16777216 true "" "plot mean [energy] of sharks"
 
 SLIDER
 278
 71
 451
-105
+104
 temp-slider
 temp-slider
 17
 40
-21.5
+17.0
 0.1
 1
 NIL
@@ -491,17 +539,6 @@ MONITOR
 478
 cyanobacterias
 count cyanobacterias
-17
-1
-11
-
-MONITOR
-319
-375
-377
-420
-fito red
-count fitoplanctons with [color = red]
 17
 1
 11
@@ -638,6 +675,21 @@ airplane
 true
 0
 Polygon -7500403 true true 150 0 135 15 120 60 120 105 15 165 15 195 120 180 135 240 105 270 120 285 150 270 180 285 210 270 165 240 180 180 285 195 285 165 180 105 180 60 165 15
+
+ant 2
+true
+0
+Polygon -7500403 true true 150 19 120 30 120 45 130 66 144 81 127 96 129 113 144 134 136 185 121 195 114 217 120 255 135 270 165 270 180 255 188 218 181 195 165 184 157 134 170 115 173 95 156 81 171 66 181 42 180 30
+Polygon -7500403 true true 150 167 159 185 190 182 225 212 255 257 240 212 200 170 154 172
+Polygon -7500403 true true 161 167 201 150 237 149 281 182 245 140 202 137 158 154
+Polygon -7500403 true true 155 135 185 120 230 105 275 75 233 115 201 124 155 150
+Line -7500403 true 120 36 75 45
+Line -7500403 true 75 45 90 15
+Line -7500403 true 180 35 225 45
+Line -7500403 true 225 45 210 15
+Polygon -7500403 true true 145 135 115 120 70 105 25 75 67 115 99 124 145 150
+Polygon -7500403 true true 139 167 99 150 63 149 19 182 55 140 98 137 142 154
+Polygon -7500403 true true 150 167 141 185 110 182 75 212 45 257 60 212 100 170 146 172
 
 arrow
 true
