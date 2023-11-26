@@ -2,11 +2,12 @@ globals [ max-fish total-energy-fishes total-energy-sharks]
 breed [ fishes fish ]
 breed [ sharks shark ]
 breed [ fitoplanctons fitoplancton ]
+breed [ cyanobacterias cyanobacteria ]
 
 fishes-own [ energy ] ; fishes y sharks tienen energia
 sharks-own [ energy ]
 
-patches-own [ countdown pH ]
+patches-own [ countdown pH temp]
 
 to setup
   clear-all
@@ -16,6 +17,7 @@ to setup
     set pcolor scale-color blue pycor -35 40
     set countdown random fitoplancton-regrowth-time
     set pH ph-Initial
+    set temp temp-slider
     ;set pcolor one-of [ blue sky ]
     ;ifelse pcolor = blue [ set countdown fitoplancton-regrowth-time ][ set countdown random fitoplancton-regrowth-time ]
   ]
@@ -35,7 +37,7 @@ to setup
     set shape "shark"
     set color 3
     set size 4  ; easier to see
-    set energy random (2 * shark-gain-from-food)
+    set energy random (3 * shark-gain-from-food)
     setxy random-xcor random-ycor
   ]
 
@@ -46,7 +48,6 @@ to setup
     set size 1  ; easier to see
     setxy random-xcor random-ycor
   ]
-
   display-labels
   reset-ticks
 end
@@ -57,7 +58,8 @@ to go
 
   ask fishes [
     move
-    set energy energy - 1  ; reducir energia
+    set energy energy - (1 * (temp / 17))
+    ; reducir energia
     eat-fitoplancton  ; comer fitoplancton
     death ; muerte en caso de quedar sin energia
     reproduce-fish  ; se reproduce segun slider
@@ -65,7 +67,7 @@ to go
 
   ask sharks [
     move
-    set energy energy - 1  ; pierden energia
+    set energy energy - (1 * (temp / 17))
     eat-fish ; comer fish
     death ; muerte en caso de quedar sin energia
     reproduce-sharks ; se reproducen segun slider
@@ -73,12 +75,13 @@ to go
 
   ask fitoplanctons [
     move-fitoplancton ; movimiento fitoplancton
+    check-temperature
   ]
 
   ask patches [
     grow-fitoplancton
-    if (pH > 8.5)[ set pH 8.5 ]
-    if (pH < 4.5)[ set pH 4.5 ]
+    set pH pH-Initial
+    set temp temp-slider
   ]
 
   set total-energy-fishes sum [energy] of fishes
@@ -102,7 +105,7 @@ end
 
 to eat-fitoplancton
   let prey one-of fitoplanctons-here            ; seleccionar un fitoplancton aleatorio
-  if prey != nobody  [                          ; si es que se obtuvo uno
+  if prey != nobody and [color] of prey != red [                          ; si es que se obtuvo uno
     ask prey [ die ]                            ; muere
     set energy energy + fish-gain-from-food     ; aumento de la energia
   ]
@@ -136,9 +139,18 @@ end
 
 to grow-fitoplancton
   ifelse countdown <= 0  ; si el countdown llega a 0 crece fitoplancton
-      [ sprout-fitoplanctons 1 [set shape "plant" set color green]
-        set countdown fitoplancton-regrowth-time ]
-  [ set countdown countdown - 1 ]
+    [
+      ifelse pH < 5
+        [ ; pH es menor a 5, reproduce más rápido
+          sprout-fitoplanctons 1 [set shape "plant" set color green]
+          set countdown fitoplancton-regrowth-time - 5
+        ]
+        [ ; pH es mayor o igual a 5, reproducción normal
+          sprout-fitoplanctons 1 [set shape "plant" set color green]
+          set countdown fitoplancton-regrowth-time
+        ]
+    ]
+    [ set countdown countdown - 1 ]
 end
 
 to display-labels
@@ -147,6 +159,14 @@ to display-labels
     ask sharks [ set label round energy ]
     ask fishes [ set label round energy ]
   ]
+end
+
+to check-temperature
+  if temp > 18 and random-float 100 < 5; Ajusta la temperatura crítica según tu modelo
+    [
+      set color red
+    ]
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -333,7 +353,8 @@ true
 PENS
 "fishes" 1.0 0 -612749 true "" "plot count fishes"
 "sharks" 1.0 0 -16449023 true "" "plot count sharks"
-"fitoplanctons / 4" 1.0 0 -10899396 true "" "plot count fitoplanctons / 4"
+"fitoplanctons / 4" 1.0 0 -10899396 true "" "plot count fitoplanctons with [color = green] / 4"
+"bacterias" 1.0 0 -2674135 true "" "plot count fitoplanctons with [color = red] / 4"
 
 MONITOR
 54
@@ -362,8 +383,8 @@ MONITOR
 434
 289
 479
-fitoplanctons
-count fitoplanctons
+fito green
+count fitoplanctons with [color = green]
 0
 1
 11
@@ -423,7 +444,7 @@ pH-Initial
 pH-Initial
 4.5
 8.5
-8.5
+4.9
 0.1
 1
 NIL
@@ -434,7 +455,7 @@ PLOT
 643
 1375
 793
-plot 1
+Energia niveles troficos
 time
 total-energy
 0.0
@@ -447,6 +468,43 @@ true
 PENS
 "energy-fishes" 1.0 0 -612749 true "" "plot total-energy-fishes"
 "energy-sharks" 1.0 0 -16777216 true "" "plot total-energy-sharks"
+
+SLIDER
+278
+71
+451
+105
+temp-slider
+temp-slider
+17
+40
+21.5
+0.1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+302
+433
+435
+478
+cyanobacterias
+count cyanobacterias
+17
+1
+11
+
+MONITOR
+319
+375
+377
+420
+fito red
+count fitoplanctons with [color = red]
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
