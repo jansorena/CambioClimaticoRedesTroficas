@@ -155,18 +155,10 @@ to death
 end
 
 to grow-fitoplancton
-  ifelse countdown <= 0  ; si el countdown llega a 0 crece fitoplancton
-    [
-      ifelse pH < 5
-        [ ; pH es menor a 5, reproduce más rápido
-          sprout-fitoplanctons 1 [set shape "plant" set color green]
-          set countdown fitoplancton-regrowth-time - 5
-        ]
-        [ ; pH es mayor o igual a 5, reproducción normal
-          sprout-fitoplanctons 1 [set shape "plant" set color green]
-          set countdown fitoplancton-regrowth-time
-        ]
-    ]
+  ifelse countdown <= 0 [ ; si el countdown llega a 0 crece fitoplancton
+    sprout-fitoplanctons 1 [set shape "plant" set color green]
+    set countdown fitoplancton-regrowth-time - ((8 - pH) * 25)
+  ]
     [ set countdown countdown - 1 ]
 end
 
@@ -180,7 +172,7 @@ end
 
 to check-temperature
   ask one-of patches [
-    sprout-cyanobacterias (temp) [
+    sprout-cyanobacterias (temp - 4) [
       set shape "ant 2"
       set color red
       setxy random-xcor random-ycor
@@ -465,10 +457,10 @@ Shark settings
 0
 
 SWITCH
-118
-396
-254
-429
+47
+388
+183
+421
 show-energy?
 show-energy?
 1
@@ -491,15 +483,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-105
-341
-277
-374
+34
+333
+206
+366
 pH-Initial
 pH-Initial
-4.5
-8.5
-4.9
+7.5
+8
+7.5
 0.1
 1
 NIL
@@ -531,9 +523,9 @@ SLIDER
 104
 temp-slider
 temp-slider
-17
-25
-17.0
+21
+32
+21.0
 0.1
 1
 NIL
@@ -546,6 +538,28 @@ MONITOR
 479
 cyanobacterias
 count cyanobacterias
+17
+1
+11
+
+MONITOR
+336
+336
+419
+381
+temperatura
+[temp] of patch 0 0
+17
+1
+11
+
+MONITOR
+211
+382
+322
+427
+pH
+[pH] of patch 0 0
 17
 1
 11

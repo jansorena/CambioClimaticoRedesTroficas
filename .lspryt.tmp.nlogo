@@ -46,9 +46,9 @@ to go
 
   set CO2Anterior CO2Actual
   set CO2Actual [ count CO2s ] ls:of climate-change-model
-  ls:let temperatura [temperature] ls:of climate-change-model
-  ls:ask red-trofica[
 
+  ls:ask red-trofica[
+    lset temperatura [temperature] ls:of climate-change-model
     ask patches [set temp temperatura - 4]
   ]
   if(CO2Actual > CO2Anterior)[
