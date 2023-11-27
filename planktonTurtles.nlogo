@@ -16,8 +16,8 @@ to setup
   ask patches [
     set pcolor scale-color blue pycor -35 40
     set countdown random fitoplancton-regrowth-time
-    set pH ph-Initial
-    set temp temp-slider
+    set pH 8
+    set temp 21
     ;set pcolor one-of [ blue sky ]
     ;ifelse pcolor = blue [ set countdown fitoplancton-regrowth-time ][ set countdown random fitoplancton-regrowth-time ]
   ]
@@ -86,8 +86,6 @@ to go
 
   ask patches [
     grow-fitoplancton
-    set pH pH-Initial
-    set temp temp-slider
   ]
 
   set total-energy-fishes sum [energy] of fishes
@@ -482,21 +480,6 @@ initial-number-fitoplanctons
 NIL
 HORIZONTAL
 
-SLIDER
-34
-333
-206
-366
-pH-Initial
-pH-Initial
-7.5
-8
-7.5
-0.1
-1
-NIL
-HORIZONTAL
-
 PLOT
 23
 643
@@ -516,21 +499,6 @@ PENS
 "energy-fishes" 1.0 0 -612749 true "" "plot total-energy-fishes"
 "energy-sharks" 1.0 0 -16777216 true "" "plot total-energy-sharks"
 
-SLIDER
-278
-71
-451
-104
-temp-slider
-temp-slider
-21
-32
-21.0
-0.1
-1
-NIL
-HORIZONTAL
-
 MONITOR
 297
 434
@@ -549,7 +517,7 @@ MONITOR
 381
 temperatura
 [temp] of patch 0 0
-17
+2
 1
 11
 
@@ -560,7 +528,7 @@ MONITOR
 427
 pH
 [pH] of patch 0 0
-17
+1
 1
 11
 
