@@ -532,7 +532,7 @@ SLIDER
 temp-slider
 temp-slider
 17
-25
+40
 17.0
 0.1
 1
