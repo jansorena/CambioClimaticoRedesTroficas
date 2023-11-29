@@ -121,64 +121,57 @@ NIL
 NIL
 1
 
-MONITOR
-40
-140
-136
-185
-CO2 Anterior
-CO2Anterior
-17
-1
-11
-
-MONITOR
-41
-239
-124
-284
-CO2 Actual
-CO2Actual
-17
-1
-11
-
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+### Objetivo del Modelo:
+
+Este modelo simula la interacción entre el cambio climático y un ecosistema marino. Muestra cómo el cambio climático, representado por niveles de dióxido de carbono (CO2) y temperatura, afecta a un ecosistema acuático. Ambos modelos están sincronizados, los cambios en el modelo de cambio climático tienen un efecto directo en el modelo del ecosistema marino.
+
+### Elementos del modelo:
+
+El modelo tiene dos partes: uno que representa el cambio climático y otro que muestra 
+un ecosistema marino.
+
+#### Modelo de Cambio Climático:
+
+Este modelo simula el cambio climático. Comienza oculto para permitir que se estabilice antes de mostrarlo.
+Se ejecuta durante 5,000 pasos para estabilizarse y luego se muestra.
+Mide la cantidad de CO2 en la atmósfera y la temperatura.
+
+#### Ecosistema Marino:
+
+Representa la vida marina y cómo responde al cambio climático.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+### Configuración Inicial:
+El modelo inicia creando dos partes: el modelo de cambio climático y el ecosistema marino.
+Se ejecuta el setup en ambos modelos para establecer las condiciones iniciales.
+### Simulación del Cambio Climático:
+
+Se ejecuta el modelo de cambio climático durante 5,000 pasos (ticks) para simular su estabilización.
+Luego, se muestra el modelo de cambio climático.
+### Interacción con el Ecosistema Marino:
+
+El modelo del ecosistema marino responde al cambio climático.
+La temperatura del agua en el ecosistema es influenciada por la temperatura del modelo climático.
+Se ajusta el pH del agua del ecosistema en respuesta a cambios en el CO2 atmosférico.
+### Observación y Seguimiento:
+
+El modelo realiza un seguimiento de la cantidad de CO2, la temperatura y el pH a lo largo del tiempo.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+### Inicio:
 
-## THINGS TO NOTICE
+Hacer clic en "Setup" para preparar la simulación.
+Hacer clic en "Go" para ejecutar la simulación y ver cómo evolucionan el cambio climático y el ecosistema marino.
 
-(suggested things for the user to notice while running the model)
-
-## THINGS TO TRY
-
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Observar cómo cambian la temperatura, el CO2 y el pH a lo largo del tiempo.
+Notar cómo estas condiciones afectan a la vida marina.
+#### Exploración:
+Para observar el efecto del cambio climático en el ecosistema marino se debe agregar CO2 del modelo de cambio climático
 @#$#@#$#@
 default
 true
