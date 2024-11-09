@@ -1,4 +1,4 @@
-globals [ max-fish total-energy-fishes total-energy-sharks]
+globals [ max-fish total-energy-fishes total-energy-sharks max-cyanobacterias]
 breed [ fishes fish ]
 breed [ sharks shark ]
 breed [ fitoplanctons fitoplancton ]
@@ -12,12 +12,14 @@ patches-own [ countdown pH temp]
 to setup
   clear-all
   ifelse netlogo-web? [ set max-fish 10000 ] [ set max-fish 30000 ]
-
+  set max-cyanobacterias 2000
   ask patches [
     set pcolor scale-color blue pycor -35 40
     set countdown random fitoplancton-regrowth-time
     set pH 8
     set temp 21
+    ;set pcolor one-of [ blue sky ]
+    ;ifelse pcolor = blue [ set countdown fitoplancton-regrowth-time ][ set countdown random fitoplancton-regrowth-time ]
   ]
 
   create-fishes initial-number-fishes  ; crear fishes
@@ -61,6 +63,7 @@ to go
     eat-fitoplancton  ; comer fitoplancton
     death ; muerte en caso de quedar sin energia
     reproduce-fish  ; se reproduce segun slider
+    ;eat-fish-cianobacterias
   ]
 
   ask sharks [
@@ -95,30 +98,12 @@ to go
   display-labels
 end
 
-;;;;; Procedimientos fitoplancton ;;;;
-
-to grow-fitoplancton
-  ifelse countdown <= 0 [ ; si el countdown llega a 0 crece fitoplancton
-    sprout-fitoplanctons 1 [set shape "plant" set color green]
-    set countdown fitoplancton-regrowth-time - ((8 - pH) * 25)
-  ]
-    [ set countdown countdown - 1 ]
-end
-
 to move-fitoplancton
   rt random 50
   lt random 50
   fd 0.1
 end
 
-to eat-cyanobacterias
-  let prey one-of cyanobacterias-here         ; seleccionar un fish aleatorio
-  if prey != nobody[                          ; si es que se obtuvo uno
-    ask prey [ die ]                          ; muere
-  ]
-end
-
-;;;;; Procedimientos fishes ;;;;;
 to move
   rt random 50
   lt random 50
@@ -133,14 +118,20 @@ to eat-fitoplancton
   ]
 end
 
+to eat-fish-cianobacterias
+  let prey one-of cyanobacterias-here         ; seleccionar un fish aleatorio
+  if prey != nobody[                          ; si es que se obtuvo uno
+    ask prey [ die ]
+    set energy energy - 2
+  ]
+end
+
 to reproduce-fish
   if random-float 100 < fish-reproduce [   ; "tirar el dado" para decidir si se reproduce o no
     set energy (energy / 2)                ; divide la energia
     hatch 1 [ rt random-float 360 fd 1 ]   ; hatch an offspring and move it forward 1 step
   ]
 end
-
-;;;;; Procedimientos sharks ;;;;;;;
 
 to reproduce-sharks
   if random-float 100 < shark-reproduce [  ; "tirar el dado" para decidir si se reproduce o no
@@ -161,7 +152,21 @@ to death
   if energy < 0 [ die ]  ; cuando la energia es 0, muere
 end
 
-;;;; Cyanobacterias ;;;;;;
+to grow-fitoplancton
+  ifelse countdown <= 0 [ ; si el countdown llega a 0 crece fitoplancton
+    sprout-fitoplanctons 1 [set shape "plant" set color green]
+    set countdown fitoplancton-regrowth-time - ((8 - pH) * 25)
+  ]
+    [ set countdown countdown - 1 ]
+end
+
+to display-labels
+  ask turtles [ set label "" ]
+  if show-energy? [
+    ask sharks [ set label round energy ]
+    ask fishes [ set label round energy ]
+  ]
+end
 
 to check-temperature
   ask one-of patches [
@@ -192,12 +197,20 @@ to contaminacion-cyanobacterias
   ]
 end
 
-;;;;;;;;;;;;;
-to display-labels
-  ask turtles [ set label "" ]
-  if show-energy? [
-    ask sharks [ set label round energy ]
-    ask fishes [ set label round energy ]
+to limitar-cyanobacterias
+  ; Limitar el número de cyanobacterias
+  if count cyanobacterias > max-cyanobacterias [
+    let exceso count cyanobacterias - max-cyanobacterias
+    ask n-of exceso cyanobacterias [
+      die
+    ]
+  ]
+end
+
+to eat-cyanobacterias
+  let prey one-of cyanobacterias-here         ; seleccionar un fish aleatorio
+  if prey != nobody[                          ; si es que se obtuvo uno
+    ask prey [ die ]                          ; muere
   ]
 end
 @#$#@#$#@
@@ -529,8 +542,7 @@ El objetivo del modelo es simular cómo los diferentes tipos de criaturas intera
 ### Agentes en el Mundo
 
 En este modelo, hay cuatro tipos de criaturas: peces, tiburones, fitoplancton y cianobacterias. Cada uno tiene su propio papel en el ecosistema acuático.
-
-### Mundo Acuático:
+Mundo Acuático:
 
 El "mundo" está dividido en patches, que son como pequeños cuadrados en los que pueden vivir las criaturas.
 
@@ -900,7 +912,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.4.0
+NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
